@@ -1,10 +1,33 @@
-name: First Workflow
 on: workflow_dispatch
-jobs: 
-  first-job:
-    runs-on: ubuntu-latest
+    # Specify when do you want to trigger
+jobs:
+  build:
+    runs-on: macos-latest
+             #self-hosted
+    defaults:
+      run:
+        working-directory: Helper
     steps:
-    - name: Print greeting
-      run: echo "Hello World"
-    - name: Print goodbye
-      run: echo "sayonara!"
+      - name: 🏗 Setup Repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v4
+        run: npm ci
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          expo-version: latest
+          # This is where the token of EAS should be imported from Git Secret
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build IOS App
+        run: eas build --platform ios --local --non-interactive ${{ github.workspace }}/app-release.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: ${{ github.workspace }}/app-release.ipa
