@@ -13,6 +13,8 @@ jobs:
 
       - name: 🏗 Setup Node
         uses: actions/setup-node@v4
+
+      - name: 🏗 Node clean install
         run: npm ci
 
       - name: 🏗 Setup EAS
